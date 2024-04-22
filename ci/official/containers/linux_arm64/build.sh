@@ -44,7 +44,9 @@ fi
 # almost all of the same cache layers
 export DOCKER_BUILDKIT=1
 for target in jax tf; do
-  IMAGE="gcr.io/tensorflow-sigs/build-arm64:$target-$TAG"
+  # IMAGE="gcr.io/tensorflow-sigs/build-arm64:$target-$TAG"
+  IMAGE="gcr.io/tensorflow-sigs/build-arm64:$target-latest-multi-python"
+  
   docker pull "$IMAGE" || true
   # Due to some flakiness of resources pulled in the build, allow the docker
   # command to reattempt build a few times in the case of failure (b/302558736)

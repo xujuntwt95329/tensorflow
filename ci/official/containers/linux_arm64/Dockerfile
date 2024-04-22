@@ -1,5 +1,5 @@
 ################################################################################
-FROM ubuntu:20.04 as builder
+FROM ubuntu:22.04 as builder
 ################################################################################
 
 # Install devtoolset build dependencies
@@ -23,17 +23,19 @@ COPY apt.conf /etc/apt/
 RUN /build_patchelf.sh
 
 ################################################################################
-FROM nvidia/cuda:12.3.1-devel-ubuntu20.04 as devel
+FROM nvidia/cuda:12.3.1-devel-ubuntu22.04 as devel
 ################################################################################
 COPY --from=builder /dt10 /dt10
+RUN echo "Step1"
 COPY --from=builder /patchelf/patchelf_0.14.3-1_arm64.deb /patchelf/patchelf_0.14.3-1_arm64.deb
-
+RUN echo "Step2"
 # Install devtoolset devel dependencies
 COPY setup.sources.sh /setup.sources.sh
 COPY setup.packages.sh /setup.packages.sh
 COPY devel.packages.txt /devel.packages.txt
 COPY cuda.packages.txt /cuda.packages.txt
 RUN /setup.sources.sh && /setup.packages.sh /devel.packages.txt
+RUN echo "Step3"
 
 # Install various tools.
 # - bats: bash unit testing framework
@@ -42,10 +44,13 @@ RUN /setup.sources.sh && /setup.packages.sh /devel.packages.txt
 # - buildifier: clean bazel build deps
 # - buildozer: clean bazel build deps
 RUN git clone --branch v1.7.0 https://github.com/bats-core/bats-core.git && bats-core/install.sh /usr/local && rm -rf bats-core
+RUN echo "Step4"
 RUN wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-arm64 -O /usr/local/bin/bazel && chmod +x /usr/local/bin/bazel
+RUN echo "Step5"
 RUN wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 https://github.com/bazelbuild/buildtools/releases/download/4.2.5/buildifier-linux-arm64 -O /usr/local/bin/buildifier && chmod +x /usr/local/bin/buildifier
+RUN echo "Step6"
 RUN wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 https://github.com/bazelbuild/buildtools/releases/download/4.2.5/buildozer-linux-arm64 -O /usr/local/bin/buildozer && chmod +x /usr/local/bin/buildozer
-
+RUN echo "Step7"
 RUN groupadd -g 1001 buildslave && useradd -m -u 1001 -g buildslave buildslave
 RUN mkdir -p /tf/venv
 RUN chown -R buildslave:buildslave /tf

@@ -25,7 +25,7 @@ devtoolset-9)
   LIBSTDCXX_ABI="new"
   ;;
 devtoolset-10)
-  LIBSTDCXX_VERSION="6.0.28"
+  LIBSTDCXX_VERSION="6.0.30"
   LIBSTDCXX_ABI="new"
   ;;
 *)
@@ -52,25 +52,47 @@ ln -s "/usr/include/aarch64-linux-gnu/asm" "${TARGET}/usr/include/asm"
 mkdir -p glibc-src
 mkdir -p glibc-build
 cd glibc-src
-wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 "https://vault.centos.org/centos/7/os/Source/SPackages/glibc-2.17-317.el7.src.rpm"
-rpm2cpio "glibc-2.17-317.el7.src.rpm" |cpio -idmv
-tar -xvzf "glibc-2.17-c758a686.tar.gz" --strip 1
-tar -xvzf "glibc-2.17-c758a686-releng.tar.gz" --strip 1
-sed -i '/patch0060/d' glibc.spec
-/rpm-patch.sh "glibc.spec"
-rm -f "glibc-2.17-317.el7.src.rpm" "glibc-2.17-c758a686.tar.gz" "glibc-2.17-c758a686-releng.tar.gz"
-patch -p1 < /gcc9-fixups.patch
-patch -p1 < /stringop_trunc.patch
+
+# wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 "https://vault.centos.org/centos/7/os/Source/SPackages/glibc-2.17-317.el7.src.rpm"
+wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 "https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/glibc-all-langpacks-2.34-105.el9.x86_64.rpm"
+
+
+
+# rpm2cpio "glibc-2.17-317.el7.src.rpm" |cpio -idmv
+rpm2cpio "glibc-all-langpacks-2.34-105.el9.x86_64.rpm" |cpio -idmv
+
+echo "HELLO_5"
+# tar -xvzf "glibc-2.17-c758a686.tar.gz" --strip 1
+tar -xvzf "glibc-all-langpacks-2.34-105.el9.x86_64.tar.gz" --strip 1
+
+# echo "HELLO_6"
+# tar -xvzf "glibc-2.17-c758a686-releng.tar.gz" --strip 1
+
+# echo "HELLO_7"
+# sed -i '/patch0060/d' glibc.spec
+# /rpm-patch.sh "glibc.spec"
+
+# echo "HELLO_8"
+# rm -f "glibc-2.17-317.el7.src.rpm" "glibc-2.17-c758a686.tar.gz" "glibc-2.17-c758a686-releng.tar.gz"
+
+# echo "HELLO_9"
+# patch -p1 < /gcc9-fixups.patch
+
+# echo "HELLO_10"
+# patch -p1 < /stringop_trunc.patch
 cd ../glibc-build
 ../glibc-src/configure --prefix=/usr --disable-werror --enable-obsolete-rpc --disable-profile
+
+echo "HELLO_12"
 make -j$(nproc)
 make install DESTDIR=${TARGET}
 cd ..
 
 # Symlinks in the binary distribution are set up for installation in /usr, we
 # need to fix up all the links to stay within /${TARGET}.
-/fixlinks.sh "/${TARGET}"
 
+/fixlinks.sh "/${TARGET}"
+echo "HELLO_13"
 # Patch to allow non-glibc 2.12 compatible builds to work.
 sed -i '54i#define TCP_USER_TIMEOUT 18' "/${TARGET}/usr/include/netinet/tcp.h"
 
@@ -81,7 +103,7 @@ wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 
     unar "libstdc++6_4.8.1-10ubuntu8_arm64.deb" && \
     tar -C "${TARGET}" -xvzf "libstdc++6_4.8.1-10ubuntu8_arm64/data.tar.gz" "./usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.18"  && \
     rm -rf "libstdc++6_4.8.1-10ubuntu8_arm64.deb" "libstdc++6_4.8.1-10ubuntu8_arm64"
-
+echo "HELLO_14"
 mkdir -p "${TARGET}-src"
 cd "${TARGET}-src"
 
@@ -93,15 +115,16 @@ devtoolset-9)
   tar -xvf "gcc-9.3.1-20200408.tar.xz" --strip 1
   ;;
 devtoolset-10)
-  wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 "https://vault.centos.org/centos/7/sclo/Source/rh/devtoolset-10-gcc-10.2.1-11.2.el7.src.rpm"
-  rpm2cpio "devtoolset-10-gcc-10.2.1-11.2.el7.src.rpm" |cpio -idmv
+  rpm2cpio "devtoolset-10-gcc-10.2.1-11.2.el7.src.rpm" |cpio -idmv  wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=5 "https://vault.centos.org/centos/7/sclo/Source/rh/devtoolset-10-gcc-10.2.1-11.2.el7.src.rpm"
+
+  echo "HELLO_15"
   tar -xvf "gcc-10.2.1-20210130.tar.xz" --strip 1
   ;;
 esac
 
 # Apply the devtoolset patches to gcc.
 /rpm-patch.sh "gcc.spec"
-
+echo "HELLO_16"
 ./contrib/download_prerequisites
 
 mkdir -p "${TARGET}-build"
@@ -133,7 +156,7 @@ cd "${TARGET}-build"
       make -j$(nproc) && \
       make install
 
-
+echo "HELLO_17"
 # Create the devtoolset libstdc++ linkerscript that links dynamically against
 # the system libstdc++ 4.4 and provides all other symbols statically.
 # Note that the installation path for libstdc++ here is ${TARGET}/usr/lib64/
@@ -144,14 +167,15 @@ echo -e "OUTPUT_FORMAT(elf64-littleaarch64)\nINPUT ( libstdc++.so.6.0.18 -lstdc+
 cp "./aarch64-unknown-linux-gnu/libstdc++-v3/src/.libs/libstdc++_nonshared44.a" \
    "${TARGET}/usr/lib64"
 
-
+echo "HELLO_18"
 # Link in architecture specific includes from the system; note that we cannot
 # link in the whole aarch64-linux-gnu folder, as otherwise we're overlaying
 # system gcc paths that we do not want to find.
 # TODO(klimek): Automate linking in all non-gcc / non-kernel include
 # directories.
 mkdir -p "${TARGET}/usr/include/aarch64-linux-gnu"
-PYTHON_VERSIONS=("python3.8" "python3.9" "python3.10" "python3.11")
+PYTHON_VERSIONS=("python3.8" "python3.9" "python3.10" "python3.11" "python3.12")
 for v in "${PYTHON_VERSIONS[@]}"; do
   ln -s "/usr/local/include/${v}" "${TARGET}/usr/include/aarch64-linux-gnu/${v}"
 done
+
