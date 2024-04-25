@@ -45,6 +45,11 @@ list(APPEND TFLITE_BENCHMARK_LIBS
   tensorflow-lite
 )
 
+add_subdirectory(${TFLITE_SOURCE_DIR}/profiling/proto)
+list(APPEND TFLITE_BENCHMARK_LIBS
+  profiling_info_proto
+)
+
 # TODO(b/171007016): Enable performance options on Windows.
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   list(APPEND TFLITE_BENCHMARK_SRCS
