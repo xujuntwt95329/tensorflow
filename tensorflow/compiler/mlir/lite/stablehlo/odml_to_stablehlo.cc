@@ -55,6 +55,7 @@ limitations under the License.
 #include "tensorflow/compiler/mlir/lite/stablehlo/transforms/stablehlo_util.h"
 #include "tensorflow/compiler/mlir/lite/stablehlo/transforms/transforms.h"
 #include "tensorflow/compiler/mlir/lite/tf_to_tfl_flatbuffer.h"
+#include "tensorflow/compiler/mlir/lite/transforms/passes.h"
 #include "tensorflow/compiler/mlir/quantization/tensorflow/passes/tf_quant_ops.h"
 #include "tensorflow/compiler/mlir/quantization/tensorflow/quantize_preprocess.h"
 #include "tensorflow/compiler/mlir/tensorflow/dialect_registration.h"
@@ -256,6 +257,7 @@ tensorflow::Status ConvertTFToStableHLO(
         mlir::odml::createPrintOpStatsPass(GetAcceptedStableHLODialects()));
   }
 
+  pm.addPass(mlir::TFL::CreateCanonicalizeBoundaryValuePass());
   if (failed(pm.run(tf_module))) {
     return tensorflow::errors::Aborted("Lowering to StableHLO failed.");
   }

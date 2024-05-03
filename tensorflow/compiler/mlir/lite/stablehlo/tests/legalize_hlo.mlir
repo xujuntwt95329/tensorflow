@@ -2974,8 +2974,8 @@ func.func @convert_int_reduce_to_sum(%arg0: tensor<1x256xi32>) -> tensor<1xi32> 
 // CHECK:           return %[[VAL_3]] : tensor<1xf32>
 // CHECK:         }
 func.func @convert_reduce_to_max(%arg0: tensor<1x256xf32>) -> tensor<1xf32> {
-  // "0xFF800000" represents -INF for f32.
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  // "0xFF7FFFFF" represents MIN for f32.
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce"(%arg0, %0) ({
   ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
     %2 = mhlo.maximum %arg1, %arg2 : tensor<f32>
@@ -3007,8 +3007,8 @@ func.func @convert_reduce_to_max_int(%arg0: tensor<1x4xi32>) -> tensor<1xi32> {
 // CHECK:           return %[[VAL_3]] : tensor<1xf32>
 // CHECK:         }
 func.func @convert_reduce_to_min(%arg0: tensor<1x256xf32>) -> tensor<1xf32> {
-  // "0x7F800000" represents INF for f32.
-  %0 = mhlo.constant dense<0x7F800000> : tensor<f32>
+  // "0x7F7FFFFF" represents the MAX for f32.
+  %0 = mhlo.constant dense<0x7F7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce"(%arg0, %0) ({
   ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
     %2 = mhlo.minimum %arg1, %arg2 : tensor<f32>
@@ -3299,8 +3299,8 @@ func.func @convert_avgpool_reshape_broadcast(%arg0: tensor<4x16x16x8xf32>) -> te
 // CHECK:           return %[[VAL_1]] : tensor<4x7x7x8xf32>
 // CHECK:         }
 func.func @convert_maxpool_valid(%arg0: tensor<4x16x16x8xf32>) -> tensor<4x7x7x8xf32> {
-  // "0xFF800000" represents -INF for f32.
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  // "0xFF7FFFFF" represents the MIN for f32.
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce_window"(%arg0, %0) ({
     ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
       %5 = mhlo.maximum %arg1, %arg2 : tensor<f32>
@@ -3320,8 +3320,8 @@ func.func @convert_maxpool_valid(%arg0: tensor<4x16x16x8xf32>) -> tensor<4x7x7x8
 // CHECK:           return %[[VAL_1]] : tensor<4x3x7x7xf32>
 // CHECK:         }
 func.func @convert_maxpool_valid_channel_first(%arg0: tensor<4x3x16x16xf32>) -> tensor<4x3x7x7xf32> {
-  // "0xFF800000" represents -INF for f32.
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  // "0xFF7FFFFF" represents the MIN for f32.
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce_window"(%arg0, %0) ({
   ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
     %2 = mhlo.maximum %arg1, %arg2 : tensor<f32>
@@ -3341,8 +3341,8 @@ func.func @convert_maxpool_valid_channel_first(%arg0: tensor<4x3x16x16xf32>) -> 
 // CHECK:           return %[[VAL_1]] : tensor<4x7x7x7x8xf32>
 // CHECK:         }
 func.func @convert_maxpool_valid_3d(%arg0: tensor<4x16x16x16x8xf32>) -> tensor<4x7x7x7x8xf32> {
-  // "0xFF800000" represents -INF for f32.
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  // "0xFF7FFFFF" represents the MIN for f32.
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce_window"(%arg0, %0) ({
     ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
       %5 = mhlo.maximum %arg1, %arg2 : tensor<f32>
@@ -3362,8 +3362,8 @@ func.func @convert_maxpool_valid_3d(%arg0: tensor<4x16x16x16x8xf32>) -> tensor<4
 // CHECK:           return %[[VAL_1]] : tensor<4x3x7x7x7xf32>
 // CHECK:         }
 func.func @convert_maxpool_valid_3d_channel_first(%arg0: tensor<4x3x16x16x16xf32>) -> tensor<4x3x7x7x7xf32> {
-  // "0xFF800000" represents -INF for f32.
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  // "0xFF7FFFFF" represents the MIN for f32.
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce_window"(%arg0, %0) ({
   ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
     %2 = mhlo.maximum %arg1, %arg2 : tensor<f32>
@@ -3383,8 +3383,8 @@ func.func @convert_maxpool_valid_3d_channel_first(%arg0: tensor<4x3x16x16x16xf32
 // CHECK:           return %[[VAL_1]] : tensor<4x8x8x8xf32>
 // CHECK:         }
 func.func @convert_maxpool_same(%arg0: tensor<4x16x16x8xf32>) -> tensor<4x8x8x8xf32> {
-  // "0xFF800000" represents -INF for f32.
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  // "0xFF7FFFFF" represents the MIN for f32.
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = "mhlo.reduce_window"(%arg0, %0) ({
     ^bb0(%arg1: tensor<f32>, %arg2: tensor<f32>):
       %6 = mhlo.maximum %arg1, %arg2 : tensor<f32>
@@ -4198,7 +4198,7 @@ func.func @convert_pytorch_argmax(%arg0: tensor<1x9xi32>) -> tensor<1xi32> {
 // CHECK:           return %[[VAL_10]], %[[VAL_11]]
 // CHECK:         }
 func.func @convert_argmax(%arg0: tensor<4x32x256xf32>) -> (tensor<4x32xf32>, tensor<4x32xi32>) {
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = mhlo.constant dense<0> : tensor<i32>
   %2 = "mhlo.iota"() <{iota_dimension = 0 : i64}> : () -> tensor<256xi32>
   %3 = "mhlo.broadcast_in_dim"(%2) <{broadcast_dimensions = dense<2> : tensor<1xi64>}> : (tensor<256xi32>) -> tensor<4x32x256xi32>
@@ -4220,7 +4220,7 @@ func.func @convert_argmax(%arg0: tensor<4x32x256xf32>) -> (tensor<4x32xf32>, ten
 
 // CHECK-LABEL: func @convert_argmax_constant(
 // CHECK-SAME:                                        %[[VAL_0:.*]]: tensor<2x2x4xf32>) -> (tensor<2x2xf32>, tensor<2x2xi32>) {
-// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<0xFF800000> : tensor<f32>}> : () -> tensor<f32>
+// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<-3.40282347E+38> : tensor<f32>}> : () -> tensor<f32>
 // CHECK-DAG:       %[[VAL_2:.*]] = "tf.Const"() <{value = dense<0> : tensor<i32>}> : () -> tensor<i32>
 // CHECK-DAG:       %[[VAL_3:.*]] = "tf.Const"() <{value = dense<{{\[\[}}[0, 1, 2, 3], [0, 1, 2, 3]], {{\[\[}}0, 1, 2, 3], [0, 1, 2, 3]]]> : tensor<2x2x4xi32>}> : () -> tensor<2x2x4xi32>
 // CHECK-DAG:       %[[VAL_4:.*]] = arith.constant dense<2> : tensor<1xi32>
@@ -4229,7 +4229,7 @@ func.func @convert_argmax(%arg0: tensor<4x32x256xf32>) -> (tensor<4x32xf32>, ten
 // CHECK:           return %[[VAL_5]], %[[VAL_6]] : tensor<2x2xf32>, tensor<2x2xi32>
 // CHECK:         }
 func.func @convert_argmax_constant(%arg0: tensor<2x2x4xf32>) -> (tensor<2x2xf32>, tensor<2x2xi32>) {
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = mhlo.constant dense<0> : tensor<i32>
   %3 = mhlo.constant dense<[[[0, 1, 2, 3], [0, 1, 2, 3]], [[0, 1, 2, 3], [0, 1, 2, 3]]]> : tensor<2x2x4xi32>
   %4:2 = "mhlo.reduce"(%arg0, %3, %0, %1) ({
@@ -4250,7 +4250,7 @@ func.func @convert_argmax_constant(%arg0: tensor<2x2x4xf32>) -> (tensor<2x2xf32>
 
 // CHECK-LABEL:   func @convert_argmax_constant_non_z_axis(
 // CHECK-SAME:      %[[VAL_0:.*]]: tensor<4x4xf32>) -> (tensor<4xf32>, tensor<4xi32>) {
-// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<0xFF800000> : tensor<f32>}> : () -> tensor<f32>
+// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<-3.40282347E+38> : tensor<f32>}> : () -> tensor<f32>
 // CHECK-DAG:       %[[VAL_2:.*]] = "tf.Const"() <{value = dense<0> : tensor<i32>}> : () -> tensor<i32>
 // CHECK-DAG:       %[[VAL_3:.*]] = "tf.Const"() <{value = dense<{{\[\[}}0, 0, 0, 0], [1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]> : tensor<4x4xi32>}> : () -> tensor<4x4xi32>
 // CHECK-DAG:       %[[VAL_4:.*]] = arith.constant dense<0> : tensor<1xi32>
@@ -4259,7 +4259,7 @@ func.func @convert_argmax_constant(%arg0: tensor<2x2x4xf32>) -> (tensor<2x2xf32>
 // CHECK:           return %[[VAL_5]], %[[VAL_6]] : tensor<4xf32>, tensor<4xi32>
 // CHECK:         }
 func.func @convert_argmax_constant_non_z_axis(%arg0: tensor<4x4xf32>) -> (tensor<4xf32>, tensor<4xi32>) {
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = mhlo.constant dense<0> : tensor<i32>
   %3 = mhlo.constant dense<[[0, 0, 0, 0], [1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]> : tensor<4x4xi32>
   %4:2 = "mhlo.reduce"(%arg0, %3, %0, %1) ({
@@ -4318,7 +4318,7 @@ func.func @convert_argmax_bool(%arg0: tensor<2xi1>) -> tensor<i32> {
 // CHECK:           return %[[VAL_10]], %[[VAL_11]]
 // CHECK:         }
 func.func @convert_argmin(%arg0: tensor<4x32x256xf32>) -> (tensor<4x32xf32>, tensor<4x32xi32>) {
-  %0 = mhlo.constant dense<0x7F800000> : tensor<f32>
+  %0 = mhlo.constant dense<0x7F7FFFFF> : tensor<f32>
   %1 = mhlo.constant dense<0> : tensor<i32>
   %2 = "mhlo.iota"() <{iota_dimension = 0 : i64}> : () -> tensor<256xi32>
   %3 = "mhlo.broadcast_in_dim"(%2) <{broadcast_dimensions = dense<2> : tensor<1xi64>}> : (tensor<256xi32>) -> tensor<4x32x256xi32>
@@ -4368,7 +4368,7 @@ func.func @convert_argmin_i16(%arg0: tensor<2xi16>) -> (tensor<i16>, tensor<i32>
 
 // CHECK-LABEL: func @convert_argmin_constant(
 // CHECK-SAME:                                        %[[VAL_0:.*]]: tensor<2x2x4xf32>) -> (tensor<2x2xf32>, tensor<2x2xi32>) {
-// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<0x7F800000> : tensor<f32>}> : () -> tensor<f32>
+// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<3.40282347E+38> : tensor<f32>}> : () -> tensor<f32>
 // CHECK-DAG:       %[[VAL_2:.*]] = "tf.Const"() <{value = dense<0> : tensor<i32>}> : () -> tensor<i32>
 // CHECK-DAG:       %[[VAL_3:.*]] = "tf.Const"() <{value = dense<{{\[\[}}[0, 1, 2, 3], [0, 1, 2, 3]], {{\[\[}}0, 1, 2, 3], [0, 1, 2, 3]]]> : tensor<2x2x4xi32>}> : () -> tensor<2x2x4xi32>
 // CHECK-DAG:       %[[VAL_4:.*]] = arith.constant dense<2> : tensor<1xi32>
@@ -4377,7 +4377,7 @@ func.func @convert_argmin_i16(%arg0: tensor<2xi16>) -> (tensor<i16>, tensor<i32>
 // CHECK:           return %[[VAL_5]], %[[VAL_6]] : tensor<2x2xf32>, tensor<2x2xi32>
 // CHECK:         }
 func.func @convert_argmin_constant(%arg0: tensor<2x2x4xf32>) -> (tensor<2x2xf32>, tensor<2x2xi32>) {
-  %0 = mhlo.constant dense<0x7F800000> : tensor<f32>
+  %0 = mhlo.constant dense<0x7F7FFFFF> : tensor<f32>
   %1 = mhlo.constant dense<0> : tensor<i32>
   %3 = mhlo.constant dense<[[[0, 1, 2, 3], [0, 1, 2, 3]], [[0, 1, 2, 3], [0, 1, 2, 3]]]> : tensor<2x2x4xi32>
   %4:2 = "mhlo.reduce"(%arg0, %3, %0, %1) ({
@@ -4429,7 +4429,7 @@ func.func @convert_argmin_bool(%arg0: tensor<2xi1>) -> tensor<i32> {
 
 // CHECK-LABEL:   func @convert_argmax_with_reshaped_iota(
 // CHECK-SAME:      %[[VAL_0:.*]]: tensor<1x32x1xf32>) -> (tensor<1x1xf32>, tensor<1x1xi32>) {
-// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<0xFF800000> : tensor<f32>}> : () -> tensor<f32>
+// CHECK-DAG:       %[[VAL_1:.*]] = "tf.Const"() <{value = dense<-3.40282347E+38> : tensor<f32>}> : () -> tensor<f32>
 // CHECK-DAG:       %[[VAL_2:.*]] = "tf.Const"() <{value = dense<0> : tensor<i32>}> : () -> tensor<i32>
 // CHECK-DAG:       %[[VAL_3:.*]] = "tf.Const"() <{value = dense<0> : tensor<i32>}> : () -> tensor<i32>
 // CHECK-DAG:       %[[VAL_4:.*]] = "tf.Const"() <{value = dense<32> : tensor<i32>}> : () -> tensor<i32>
@@ -4443,7 +4443,7 @@ func.func @convert_argmin_bool(%arg0: tensor<2xi1>) -> tensor<i32> {
 // CHECK:           return %[[VAL_10]], %[[VAL_11]] : tensor<1x1xf32>, tensor<1x1xi32>
 // CHECK:         }
 func.func @convert_argmax_with_reshaped_iota(%arg0: tensor<1x32x1xf32>) -> (tensor<1x1xf32>, tensor<1x1xi32>) {
-  %0 = mhlo.constant dense<0xFF800000> : tensor<f32>
+  %0 = mhlo.constant dense<0xFF7FFFFF> : tensor<f32>
   %1 = mhlo.constant dense<0> : tensor<i32>
   %2 = "mhlo.iota"() <{iota_dimension = 0 : i64}> : () -> tensor<32xi32>
   %3 = "mhlo.reshape"(%2) : (tensor<32xi32>) -> tensor<1x32x1xi32>

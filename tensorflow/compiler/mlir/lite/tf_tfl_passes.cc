@@ -145,6 +145,8 @@ void AddPreQuantizationStableHloToTfPasses(
   pass_manager.addPass(
       mlir::odml::CreateLegalizeTFXlaCallModuleToStablehloPass());
 
+  pass_manager.addPass(mlir::TFL::CreateCanonicalizeBoundaryValuePass());
+
   // Legalize MHLO to StableHLO should be moved closer to where it is needed
   // There are some entry points that start with HLO->MHLO like
   // jax_to_tfl_flatbuffer.cc which can likely be updated to emit StableHLO
@@ -400,6 +402,7 @@ void AddPostVariableFreezingTFToTFLConversionPasses(
     pass_manager->addPass(mlir::tf_saved_model::CreateFreezeGlobalTensorsPass(
         /*allow_mutable_tensors=*/pass_config.enable_tflite_variables));
   }
+  pass_manager->addPass(mlir::TFL::CreateCanonicalizeBoundaryValuePass());
 
   if (!saved_model_dir.empty()) {
     // This pass 'freezes' tf saved model asset ops and inlines as string values
