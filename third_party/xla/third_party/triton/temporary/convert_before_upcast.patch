@@ -1,0 +1,30 @@
+// Fixes b/331360119 by applying a local fix instead of removing the pass
+// entirely. This should be moved to internal public patches. Of course ideally
+// could be upstreamed to OAI but not sure whether they would accept the change.
+
+diff --git a/lib/Dialect/TritonGPU/Transforms/RemoveLayoutConversions.cpp b/lib/Dialect/TritonGPU/Transforms/RemoveLayoutConversions.cpp
+--- a/lib/Dialect/TritonGPU/Transforms/RemoveLayoutConversions.cpp
++++ b/lib/Dialect/TritonGPU/Transforms/RemoveLayoutConversions.cpp
+@@ -1082,13 +1082,18 @@ void LayoutRematerialization::backwardRe
+ // of the convert.
+ void LayoutRematerialization::hoistConvertOnTopOfExtOrBroadcast(
+     ConvertLayoutOp convertOp) {
+-  // we don't handle conversions to DotOperandEncodingAttr
+-  // this is a heuristics to accommodate fused attention
+   RankedTensorType targetType = convertOp.getType();
+-  if (mlir::isa<DotOperandEncodingAttr>(targetType.getEncoding()))
+-    return;
+ 
+   auto isExtOrBroadcastOp = [](Operation *op) {
++    // In addition to Ext and Broadcast, we should also check for these converts
++    // in the upcast scenario
++    if (isa<arith::SIToFPOp, arith::UIToFPOp>(op)) {
++      int inBitWidth =
++          getElementTypeOrSelf(op->getOperand(0)).getIntOrFloatBitWidth();
++      int outBitWidth =
++          getElementTypeOrSelf(op->getResult(0)).getIntOrFloatBitWidth();
++      return inBitWidth < outBitWidth;
++    }
+     return isa<arith::ExtSIOp, arith::ExtUIOp, arith::ExtFOp, BroadcastOp,
+                ExpandDimsOp>(op);
+   };
