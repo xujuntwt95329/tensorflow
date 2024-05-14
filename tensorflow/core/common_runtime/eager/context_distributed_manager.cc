@@ -79,6 +79,8 @@ limitations under the License.
 #if (defined(PLATFORM_GOOGLE) && defined(TF_PLATFORM_LINUX_X86_64))
 #define TF_GPU_USE_PJRT
 #include "xla/pjrt/distributed/key_value_store_interface.h"
+#include "xla/pjrt/gpu/gpu_topology.h"
+#include "xla/pjrt/gpu/gpu_topology.pb.h"
 #include "xla/pjrt/gpu/se_gpu_pjrt_client.h"
 #include "xla/pjrt/local_device_state.h"
 #include "xla/pjrt/pjrt_compiler.h"
@@ -328,9 +330,11 @@ absl::Status CreateClientOnce(
     // proceed.
     creation_state->SetReady();
   }
+  xla::GpuTopologyProto gpu_topology;
   auto status = BuildDistributedDevices(
       platform_name, std::move(unique_local_device_states), node_id, num_nodes,
-      &pjrt_devices, gpu_run_options.get(), kv_store,
+      &pjrt_devices, gpu_run_options.get(),
+      use_creation_info ? &gpu_topology : nullptr, kv_store,
       /*enable_mock_nccl=*/false);
   if (!status.ok()) {
     if (use_creation_info) {
@@ -360,7 +364,10 @@ absl::Status CreateClientOnce(
             /*allocator=*/std::move(info->allocator),
             /*host_memory_allocator=*/std::move(info->host_memory_allocator),
             /*should_stage_host_to_device_transfers=*/true,
-            /*gpu_run_options=*/std::move(gpu_run_options));
+            /*gpu_run_options=*/std::move(gpu_run_options),
+            /*gpu_topology=*/
+            std::shared_ptr<const xla::GpuTopology>(
+                xla::GpuTopology::FromProto(gpu_topology)));
     VLOG(2) << "PJRT GPU client with remote devices created.";
     status = SetPjRtClientInTFGlobalResourceManager(DeviceType(DEVICE_GPU),
                                                     std::move(pjrt_client));
@@ -1139,6 +1146,7 @@ Status EagerContextDistributedManager::EnableCollectiveOps(
       for (auto& local_device : local_devices) {
         devices.mutable_device()->Add()->PackFrom(local_device);
       }
+      LOG(INFO) << "xiangll device size is " << devices.device_size();
       LOG_AND_RETURN_IF_ERROR(coordination_service_agent_->Connect());
       LOG_AND_RETURN_IF_ERROR(
           coordination_service_agent_->WaitForAllTasks(devices));

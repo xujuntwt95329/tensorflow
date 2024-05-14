@@ -272,6 +272,8 @@ tf_cuda_library(
                 "//tensorflow/core",
                 "//tensorflow/core/framework:resource_base",
                 "@local_xla//xla/pjrt/distributed:key_value_store_interface",
+                "@local_xla//xla/pjrt/gpu:gpu_topology",
+                "@local_xla//xla/pjrt/gpu:gpu_topology_proto_cc",
                 "@local_xla//xla/pjrt:local_device_state",
                 "@local_xla//xla/pjrt:pjrt_client",
                 "@local_xla//xla/pjrt:pjrt_compiler",
