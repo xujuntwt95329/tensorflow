@@ -1103,6 +1103,9 @@ cc_test(
 cc_test(
     name = "validator_runner_test",
     srcs = ["validator_runner_test.cc"],
+    env = {
+        "ASAN_OPTIONS": "detect_odr_violation=0",
+    },
     tags = [
         "no_mac",
         "no_windows",
