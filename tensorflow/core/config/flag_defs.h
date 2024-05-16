@@ -61,6 +61,8 @@ class Flags {
                   "propagated during while op lowering to switch/merge ops.")
   TF_DECLARE_FLAG(enable_tf2min_ici_weight, false,
                   "If true, ici weight optimization will be used in tf2/min.")
+  TF_DECLARE_FLAG(enable_function_pruning_before_inlining, false,
+                  "If true, functions will be pruned before inlining.")
   // LINT.ThenChange(//tensorflow/core/config/flags_api_wrapper.cc)
 };
 
