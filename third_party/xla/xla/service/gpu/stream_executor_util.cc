@@ -624,7 +624,7 @@ bool RequireDeterminism(const HloModuleConfig& config) {
     return cudnn_deterministic;
   }();
   return require_cudnn_determinism ||
-         config.debug_options().xla_gpu_deterministic_ops();
+         config.debug_options().xla_gpu_exclude_nondeterministic_ops();
 }
 
 namespace {
